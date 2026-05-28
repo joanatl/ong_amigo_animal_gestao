@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  volunteer
+}
+
+enum AnimalStatus {
+  available
+  adopted
+  under_treatment
+}
+
+enum AnimalSpecies {
+  dog
+  cat
+  other
+}
+
+enum AnimalSize {
+  small
+  medium
+  large
+}
+
+enum EventVisibility {
+  public
+  private
+}
+
+model User {
+  id            String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String         @db.VarChar(120)
+  email         String         @unique @db.VarChar(255)
+  passwordHash  String         @map("password_hash") @db.VarChar(255)
+  role          Role           @default(volunteer)
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz
+  animals       Animal[]
+  adopters      Adopter[]
+  events        Event[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash") @db.VarChar(64)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Animal {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String          @db.VarChar(100)
+  birthDate      DateTime        @map("birth_date") @db.Date
+  breed          String?         @db.VarChar(100)
+  species        AnimalSpecies   @default(dog)
+  status         AnimalStatus    @default(available)
+  size           AnimalSize?
+  weightKg       Decimal?        @map("weight_kg") @db.Decimal(5, 2)
+  color          String?         @db.VarChar(50)
+  fosterHome     String?         @map("foster_home") @db.VarChar(200)
+  entryDate      DateTime        @default(now()) @map("entry_date") @db.Date
+  photoUrl       String?         @map("photo_url")
+  photoKey       String?         @map("photo_key")
+  description    String?
+  attachmentKeys String[]        @default([]) @map("attachment_keys")
+  createdBy      String?         @map("created_by") @db.Uuid
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz
+  creator        User?           @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  adopters       AdopterAnimal[]
+
+  @@map("animals")
+}
+
+model Adopter {
+  id             String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name           String          @db.VarChar(120)
+  address        String          @db.VarChar(300)
+  email          String?         @db.VarChar(255)
+  phone          String?         @db.VarChar(30)
+  description    String?
+  attachmentKeys String[]        @default([]) @map("attachment_keys")
+  photoUrl       String?         @map("photo_url")
+  photoKey       String?         @map("photo_key")
+  animals        AdopterAnimal[]
+  createdBy      String?         @map("created_by") @db.Uuid
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz
+  creator        User?           @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@map("adopters")
+}
+
+model AdopterAnimal {
+  adopterId        String   @map("adopter_id") @db.Uuid
+  animalId         String   @map("animal_id") @db.Uuid
+  adoptionDate     DateTime @map("adoption_date") @db.Date
+  adoptionLocation String?  @map("adoption_location") @db.VarChar(200)
+  adopter          Adopter  @relation(fields: [adopterId], references: [id], onDelete: Cascade)
+  animal           Animal   @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  @@id([adopterId, animalId])
+  @@map("adopter_animals")
+}
+
+model Event {
+  id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String          @db.VarChar(200)
+  description String?
+  eventDate   DateTime        @map("event_date") @db.Timestamptz
+  location    String?         @db.VarChar(255)
+  visibility  EventVisibility @default(public)
+  createdBy   String          @map("created_by") @db.Uuid
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime        @updatedAt @map("updated_at") @db.Timestamptz
+  creator     User            @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("events")
+}
