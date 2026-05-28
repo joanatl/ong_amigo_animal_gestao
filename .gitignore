@@ -1,0 +1,24 @@
+node_modules
+.env
+.env.local
+.turbo
+dist
+.next
+build
+*.tsbuildinfo
+
+# Prisma
+prisma/migrations/*/migration.sql.bak
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Playwright snapshots e resultados
+.playwright-cli/
+.playwright/
+test-results/
+screenshots/
+*.png
+
