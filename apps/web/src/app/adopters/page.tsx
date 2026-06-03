@@ -33,8 +33,7 @@ export default function AdoptersPage() {
     }
   }
 
-  const canDelete = (createdBy: string | null) =>
-    !!user && (user.role === 'admin' || user.id === createdBy)
+  const canDelete = () => !!user
 
   return (
     <div>
@@ -104,7 +103,7 @@ export default function AdoptersPage() {
               key={adopter.id}
               adopter={adopter}
               showActions={!!user}
-              onDelete={canDelete(adopter.createdBy) ? () => handleDelete(adopter.id) : undefined}
+              onDelete={canDelete() ? () => handleDelete(adopter.id) : undefined}
             />
           ))}
         </div>

@@ -59,8 +59,7 @@ export default function AnimalsPage() {
     }
   }
 
-  const canDelete = (createdBy: string | null) =>
-    !!user && (user.role === 'admin' || user.id === createdBy)
+  const canDelete = () => !!user
 
   const hasActiveFilters = !!filters.status || !!filters.species || !!filters.search
 
@@ -172,7 +171,7 @@ export default function AnimalsPage() {
               key={animal.id}
               animal={animal}
               showActions={!!user}
-              onDelete={canDelete(animal.createdBy) ? () => handleDelete(animal.id) : undefined}
+              onDelete={canDelete() ? () => handleDelete(animal.id) : undefined}
             />
           ))}
         </div>

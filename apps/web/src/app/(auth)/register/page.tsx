@@ -75,6 +75,7 @@ export default function RegisterPage() {
                 id="password"
                 {...register('password')}
                 type="password"
+                autoComplete="new-password"
                 className={inputClass}
               />
               {errors.password && (

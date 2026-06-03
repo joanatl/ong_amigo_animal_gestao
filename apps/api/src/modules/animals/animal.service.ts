@@ -153,15 +153,11 @@ export async function updateAnimal(
 export async function deleteAnimal(
   fastify: FastifyInstance,
   id: string,
-  userId: string,
-  userRole: string,
+  _userId: string,
+  _userRole: string,
 ) {
   const animal = await fastify.prisma.animal.findUnique({ where: { id } })
   if (!animal) throw { statusCode: 404, message: 'Animal não encontrado' }
-
-  if (animal.createdBy !== userId && userRole !== 'admin') {
-    throw { statusCode: 403, message: 'Apenas o cadastrador ou admin pode excluir este animal' }
-  }
 
   // Remove foto do MinIO se existir
   if (animal.photoKey) {

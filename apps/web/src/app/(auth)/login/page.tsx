@@ -64,6 +64,7 @@ export default function LoginPage() {
                 id="password"
                 {...register('password')}
                 type="password"
+                autoComplete="current-password"
                 className={inputClass}
               />
               {errors.password && (

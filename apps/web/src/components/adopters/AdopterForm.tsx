@@ -56,7 +56,7 @@ export function AdopterForm({ defaultValues, onSubmit, isLoading, onCancel }: Pr
     const current = watch('animals') ?? []
     const next = ids.map((id) => {
       const existing = current.find((a) => a.animalId === id)
-      return existing ?? { animalId: id, adoptionDate: '' }
+      return existing ?? { animalId: id, adoptionDate: '', adoptionLocation: '' }
     })
     setValue('animals', next)
   }
@@ -208,26 +208,46 @@ export function AdopterForm({ defaultValues, onSubmit, isLoading, onCancel }: Pr
           <ul className="mt-3 space-y-2">
             {animalFields.map((af, idx) => {
               const animal = animalsData?.data.find((a) => a.id === af.animalId)
+              const displayName = animal
+                ? animal.name.charAt(0).toUpperCase() + animal.name.slice(1)
+                : af.animalId
               return (
                 <li
                   key={af.animalId}
-                  className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2"
+                  className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 space-y-2"
                 >
-                  <span className="flex-1 text-sm font-medium text-gray-800 truncate">
-                    {animal
-                      ? animal.name.charAt(0).toUpperCase() + animal.name.slice(1)
-                      : af.animalId}
+                  <span className="block text-sm font-medium text-gray-800 truncate">
+                    {displayName}
                   </span>
-                  <label className="shrink-0 text-xs text-gray-500">Data de adoção</label>
-                  <DateInput
-                    value={af.adoptionDate}
-                    onChange={(iso) => {
-                      const next = [...animalFields]
-                      next[idx] = { ...next[idx], adoptionDate: iso }
-                      setValue('animals', next)
-                    }}
-                    className="w-32 rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Data de adoção *</label>
+                      <DateInput
+                        value={af.adoptionDate}
+                        onChange={(iso) => {
+                          const next = [...animalFields]
+                          next[idx] = { ...next[idx], adoptionDate: iso }
+                          setValue('animals', next)
+                        }}
+                        className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-500 mb-1">Local de adoção</label>
+                      <input
+                        type="text"
+                        value={af.adoptionLocation ?? ''}
+                        onChange={(e) => {
+                          const next = [...animalFields]
+                          next[idx] = { ...next[idx], adoptionLocation: e.target.value }
+                          setValue('animals', next)
+                        }}
+                        placeholder="Ex: Feira de adoção"
+                        maxLength={200}
+                        className="w-full rounded border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      />
+                    </div>
+                  </div>
                 </li>
               )
             })}

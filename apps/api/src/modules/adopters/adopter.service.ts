@@ -180,15 +180,11 @@ export async function updateAdopter(
 export async function deleteAdopter(
   fastify: FastifyInstance,
   id: string,
-  userId: string,
-  userRole: string,
+  _userId: string,
+  _userRole: string,
 ) {
   const adopter = await fastify.prisma.adopter.findUnique({ where: { id } })
   if (!adopter) throw { statusCode: 404, message: 'Adotante não encontrado' }
-
-  if (adopter.createdBy !== userId && userRole !== 'admin') {
-    throw { statusCode: 403, message: 'Apenas o cadastrador ou admin pode excluir este adotante' }
-  }
 
   await fastify.prisma.adopter.delete({ where: { id } })
 }

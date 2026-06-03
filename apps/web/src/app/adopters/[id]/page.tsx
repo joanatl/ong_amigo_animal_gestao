@@ -53,7 +53,7 @@ export default function AdopterDetailPage({ params }: { params: { id: string } }
     )
   }
 
-  const canEdit = !!user && (user.role === 'admin' || user.id === adopter.createdBy)
+  const canEdit = !!user
 
   const handleDelete = async () => {
     if (!confirm(`Excluir ${adopter.name}? Esta ação não pode ser desfeita.`)) return

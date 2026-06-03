@@ -8,7 +8,7 @@ import { useToast } from '@/contexts/ToastContext'
 import { api } from '@/lib/api'
 
 export default function ProfilePage() {
-  const { user } = useAuth()
+  const { user, isLoading: authLoading } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
 
@@ -21,9 +21,10 @@ export default function ProfilePage() {
   const [passwordLoading, setPasswordLoading] = useState(false)
 
   useEffect(() => {
-    if (!user) router.replace('/login')
-  }, [user, router])
+    if (!authLoading && !user) router.replace('/login')
+  }, [authLoading, user, router])
 
+  if (authLoading) return <p className="text-gray-500">Carregando...</p>
   if (!user) return null
 
   async function handleChangePassword(e: React.FormEvent) {
